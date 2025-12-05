@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Quiz with Registration</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 24px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 24px 28px 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 28px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #cbd5f5;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.25);
+      opacity: 0.95;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+
+    .section-card {
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), transparent 55%),
+                  radial-gradient(circle at bottom, rgba(168, 85, 247, 0.15), transparent 55%),
+                  #020617;
+      border-radius: 12px;
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      margin-top: 10px;
+    }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: #cbd5f5;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(15, 118, 110, 0.25);
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      color: #a5f3fc;
+    }
+
+    .question-card {
+      margin-bottom: 16px;
+      padding: 14px 14px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: #020617;
+    }
+
+    .question-card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #e5e7eb;
+    }
+
+    .options {
+      margin-left: 4px;
+    }
+
+    .option-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .option-label input {
+      margin-right: 6px;
+      accent-color: #38bdf8;
+    }
+
+    .result-box {
+      margin-top: 6px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 14px;
+    }
+
+    .result-box strong {
+      font-size: 16px;
+    }
+
+    .result-details {
+      font-size: 13px;
+      margin-top: 6px;
+      color: #cbd5f5;
+    }
+
+    .pass {
+      color: #4ade80;
+    }
+
+    .fail {
+      color: #f97373;
+    }
+
+    .info-line {
+      font-size: 13px;
+      color: #cbd5f5;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 18px 16px 24px;
+        margin: 10px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Web Tech Quiz</h1>
+
+    <!-- Registration Section -->
+    <section id="registration-section" class="section-card">
+      <h2>Student Registration</h2>
+      <form id="registration-form">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" required placeholder="Enter your name" />
+
+        <label for="email">Email / Roll No.</label>
+        <input type="email" id="email" required placeholder="Enter your email (or roll no. text)" />
+
+        <button type="submit">
+          Start Quiz
+          <span>➜</span>
+        </button>
+      </form>
+      <p class="info-line">
+        After registration, you will get <strong>15 random questions</strong> (out of 50) and
+        your result will be shown immediately after submitting.
+      </p>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz-section" class="section-card hidden">
+      <div class="user-bar">
+        <div>
+          <span id="userNameDisplay" class="badge"></span>
+        </div>
+        <div id="questionCount" class="badge"></div>
+      </div>
+
+      <form id="quiz-form">
+        <div id="questions-container"></div>
+        <button type="submit">
+          Submit Quiz
+        </button>
+      </form>
+    </section>
+
+    <!-- Result Section -->
+    <section id="result-section" class="section-card hidden">
+      <h2>Quiz Result</h2>
+      <div class="result-box">
+        <p><strong id="resultName"></strong></p>
+        <p>Score: <strong id="resultScore"></strong></p>
+        <p>Percentage: <strong id="resultPercent"></strong></p>
+        <p>Status: <strong id="resultStatus"></strong></p>
+        <div class="result-details">
+          <p>Total Questions Shown: <span id="resultTotal"></span></p>
+          <p>Correct Answers: <span id="resultCorrect"></span></p>
+          <p>Wrong / Unattempted: <span id="resultWrong"></span></p>
+        </div>
+      </div>
+      <button id="retake-btn">
+        Take Quiz Again
+      </button>
+    </section>
+  </div>
+
+  <script>
+    // --------------- Question Bank (50 questions) ---------------
+    // NOTE: These are sample questions. You can replace text with your own.
+    const ALL_QUESTIONS = [
+      {
+        id: 1,
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "Hyperlink and Text Making Language",
+          "Home Tool Markup Language",
+          "Hyper Transfer Markup Language"
+        ],
+        answer: 0
+      },
+      {
+        id: 2,
+        question: "Which tag is used to link an external CSS file?",
+        options: ["<style>", "<css>", "<link>", "<script>"],
+        answer: 2
+      },
+      {
+        id: 3,
+        question: "Which HTML tag is used to create a hyperlink?",
+        options: ["<p>", "<a>", "<h1>", "<div>"],
+        answer: 1
+      },
+      {
+        id: 4,
+        question: "Which property is used in CSS to change the text color?",
+        options: ["font-color", "text-style", "color", "background-color"],
+        answer: 2
+      },
+      {
+        id: 5,
+        question: "Inside which HTML element do we put the JavaScript?",
+        options: ["<script>", "<javascript>", "<js>", "<code>"],
+        answer: 0
+      },
+      {
+        id: 6,
+        question: "Which symbol is used for single-line comments in JavaScript?",
+        options: ["//", "/*", "<!-- -->", "#"],
+        answer: 0
+      },
+      {
+        id: 7,
+        question: "Which method is used to print something in browser console?",
+        options: ["console.print()", "log()", "console.log()", "print.console()"],
+        answer: 2
+      },
+      {
+        id: 8,
+        question: "Which CSS property is used to change the background color?",
+        options: ["color", "bg-color", "background-color", "background-style"],
+        answer: 2
+      },
+      {
+        id: 9,
+        question: "Which HTML tag is used to display an image?",
+        options: ["<pic>", "<img>", "<image>", "<src>"],
+        answer: 1
+      },
+      {
+        id: 10,
+        question: "In JavaScript, which keyword is used to declare a constant variable?",
+        options: ["var", "const", "let", "static"],
+        answer: 1
+      },
+      {
+        id: 11,
+        question: "Which HTML element is used for the largest heading?",
+        options: ["<h6>", "<h1>", "<head>", "<heading>"],
+        answer: 1
+      },
+      {
+        id: 12,
+        question: "Which attribute is used in HTML to provide alternate text for an image?",
+        options: ["title", "alt", "src", "name"],
+        answer: 1
+      },
+      {
+        id: 13,
+        question: "Which CSS property controls the size of text?",
+        options: ["text-size", "font-style", "text-style", "font-size"],
+        answer: 3
+      },
+      {
+        id: 14,
+        question: "Which method is used to select an element by ID in JavaScript?",
+        options: [
+          "document.querySelectorAll()",
+          "document.getElementById()",
+          "document.getElementsByClassName()",
+          "document.getElementByName()"
+        ],
+        answer: 1
+      },
+      {
+        id: 15,
+        question: "Which HTML5 element is used for navigation links?",
+        options: ["<navigator>", "<nav>", "<menu>", "<links>"],
+        answer: 1
+      },
+      {
+        id: 16,
+        question: "How do you write an array in JavaScript?",
+        options: [
+          "var arr = (1,2,3)",
+          "var arr = [1,2,3]",
+          "var arr = {1,2,3}",
+          "var arr = <1,2,3>"
+        ],
+        answer: 1
+      },
+      {
+        id: 17,
+        question: "Which CSS property is used to create space inside the border of an element?",
+        options: ["margin", "padding", "spacing", "border-gap"],
+        answer: 1
+      },
+      {
+        id: 18,
+        question: "Which event is fired when a user clicks on an HTML element?",
+        options: ["onmouse", "onhover", "onclick", "onpress"],
+        answer: 2
+      },
+      {
+        id: 19,
+        question: "Which JavaScript function is used to parse a JSON string?",
+        options: ["JSON.parse()", "JSON.stringify()", "JSON.convert()", "JSON.toString()"],
+        answer: 0
+      },
+      {
+        id: 20,
+        question: "Which HTML tag is used to create an ordered list?",
+        options: ["<ol>", "<ul>", "<li>", "<list>"],
+        answer: 0
+      },
+      // --- The remaining are generic sample questions; you can customize them ---
+      {
+        id: 21,
+        question: "Sample Question 21: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 22,
+        question: "Sample Question 22: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 23,
+        question: "Sample Question 23: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 24,
+        question: "Sample Question 24: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 25,
+        question: "Sample Question 25: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 26,
+        question: "Sample Question 26: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 27,
+        question: "Sample Question 27: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 28,
+        question: "Sample Question 28: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 29,
+        question: "Sample Question 29: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 30,
+        question: "Sample Question 30: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 31,
+        question: "Sample Question 31: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 32,
+        question: "Sample Question 32: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 33,
+        question: "Sample Question 33: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 34,
+        question: "Sample Question 34: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 35,
+        question: "Sample Question 35: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 36,
+        question: "Sample Question 36: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 37,
+        question: "Sample Question 37: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 38,
+        question: "Sample Question 38: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 39,
+        question: "Sample Question 39: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 40,
+        question: "Sample Question 40: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 41,
+        question: "Sample Question 41: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 42,
+        question: "Sample Question 42: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 43,
+        question: "Sample Question 43: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 44,
+        question: "Sample Question 44: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 45,
+        question: "Sample Question 45: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 46,
+        question: "Sample Question 46: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      },
+      {
+        id: 47,
+        question: "Sample Question 47: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 2
+      },
+      {
+        id: 48,
+        question: "Sample Question 48: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 3
+      },
+      {
+        id: 49,
+        question: "Sample Question 49: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 0
+      },
+      {
+        id: 50,
+        question: "Sample Question 50: Which option is correct?",
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1
+      }
+    ];
+
+    // --------------- Utility: shuffle and pick random questions ---------------
+    function getRandomQuestions(allQuestions, count) {
+      const array = [...allQuestions]; // copy
+      // Fisher–Yates shuffle
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array.slice(0, count);
+    }
+
+    // --------------- DOM Elements ---------------
+    const registrationSection = document.getElementById("registration-section");
+    const quizSection = document.getElementById("quiz-section");
+    const resultSection = document.getElementById("result-section");
+
+    const registrationForm = document.getElementById("registration-form");
+    const quizForm = document.getElementById("quiz-form");
+
+    const questionsContainer = document.getElementById("questions-container");
+    const userNameDisplay = document.getElementById("userNameDisplay");
+    const questionCountLabel = document.getElementById("questionCount");
+
+    const resultName = document.getElementById("resultName");
+    const resultScore = document.getElementById("resultScore");
+    const resultPercent = document.getElementById("resultPercent");
+    const resultStatus = document.getElementById("resultStatus");
+    const resultTotal = document.getElementById("resultTotal");
+    const resultCorrect = document.getElementById("resultCorrect");
+    const resultWrong = document.getElementById("resultWrong");
+
+    const retakeBtn = document.getElementById("retake-btn");
+
+    let currentUser = null;
+    let selectedQuestions = [];
+
+    // --------------- Registration Submit ---------------
+    registrationForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!name || !email) {
+        alert("Please enter both name and email / roll no.");
+        return;
+      }
+
+      currentUser = { name, email };
+
+      // Show quiz section
+      registrationSection.classList.add("hidden");
+      resultSection.classList.add("hidden");
+      quizSection.classList.remove("hidden");
+
+      userNameDisplay.textContent = `Name: ${currentUser.name}`;
+
+      // Pick 15 random questions from 50
+      selectedQuestions = getRandomQuestions(ALL_QUESTIONS, 15);
+      renderQuestions();
+    });
+
+    // --------------- Render Questions ---------------
+    function renderQuestions() {
+      questionsContainer.innerHTML = "";
+
+      selectedQuestions.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+
+        const qTitle = document.createElement("h3");
+        qTitle.textContent = `Q${index + 1}. ${q.question}`;
+        card.appendChild(qTitle);
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.className = "options";
+
+        q.options.forEach((opt, optIndex) => {
+          const label = document.createElement("label");
+          label.className = "option-label";
+
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = `question-${index}`;
+          radio.value = optIndex;
+
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(opt));
+          optionsDiv.appendChild(label);
+        });
+
+        card.appendChild(optionsDiv);
+        questionsContainer.appendChild(card);
+      });
+
+      questionCountLabel.textContent = `Questions: ${selectedQuestions.length} (random from 50)`;
+    }
+
+    // --------------- Quiz Submit (Calculate Result) ---------------
+    quizForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      let correct = 0;
+      const total = selectedQuestions.length;
+
+      selectedQuestions.forEach((q, index) => {
+        const selected = document.querySelector(
+          `input[name="question-${index}"]:checked`
+        );
+        if (selected && Number(selected.value) === q.answer) {
+          correct++;
+        }
+      });
+
+      const wrong = total - correct;
+      const percent = Math.round((correct / total) * 100);
+      const status = percent >= 40 ? "PASS" : "FAIL"; // you can change pass criteria
+
+      // Show result immediately
+      quizSection.classList.add("hidden");
+      resultSection.classList.remove("hidden");
+
+      resultName.textContent = `Student: ${currentUser.name} (${currentUser.email})`;
+      resultScore.textContent = `${correct} / ${total}`;
+      resultPercent.textContent = percent + "%";
+      resultStatus.textContent = status;
+      resultStatus.className = percent >= 40 ? "pass" : "fail";
+
+      resultTotal.textContent = total;
+      resultCorrect.textContent = correct;
+      resultWrong.textContent = wrong;
+    });
+
+    // --------------- Retake Quiz ---------------
+    retakeBtn.addEventListener("click", function () {
+      // If you want to use same user again without re-entering details,
+      // just hide result and show quiz with new random questions:
+      quizSection.classList.remove("hidden");
+      resultSection.classList.add("hidden");
+
+      selectedQuestions = getRandomQuestions(ALL_QUESTIONS, 15);
+      renderQuestions();
+    });
+  </script>
+</body>
+</html>
